@@ -1,0 +1,18 @@
+[
+ {
+  "directory": "C:\\Users\\User\\Desktop\\Projects\\LibraryManagementSystem",
+  "arguments": [
+   "g++",
+   "-std=c++17",
+   "-Wall",
+   "-Wextra",
+   "-Werror",
+   "-pedantic",
+   "-c",
+   "src/main.cpp",
+   "-o",
+   "build/obj/main.o"
+  ],
+  "file": "src/main.cpp"
+ }
+]
