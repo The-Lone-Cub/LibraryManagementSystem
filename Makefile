@@ -1,39 +1,43 @@
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -Werror -pedantic
-CXXLIBS = -lpthread
+CXX = clang++
+CXXFLAGS = -std=c++23 -Wall -Wextra -Werror -pedantic -MMD -MP -I.
+CXXLIBS = -luser32 -lgdi32
 
 # Directories
 SRC_DIR = src
 BUILD_DIR = build
 OBJ_DIR = $(BUILD_DIR)/obj
+DEP_DIR = $(BUILD_DIR)/dep
 BIN_DIR = $(BUILD_DIR)/bin
 
 # Source and object files
 SRCS = $(shell C:/msys64/usr/bin/bash.exe -c "C:/msys64/usr/bin/find $(SRC_DIR) -name '*.cpp'")
-REL_SRCS = $(patsubst $(SRC_DIR)/,, $(SRCS))
-OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(REL_SRCS))
+SRCS := $(patsubst $(SRC_DIR)/%, %, $(SRCS))
+OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
+DEPS = $(patsubst $(OBJ_DIR)/%.o, $(DEP_DIR)/%.d, $(OBJS))
 
-# Binary executable
-TARGET = $(BIN_DIR)/library.exe
+TARGET = $(BIN_DIR)/lib.exe
+
+.PHONY: all clean run
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	@mkdir -p $(dir $@)
 	@echo "Linking $@ ..."
-	@$(CXX) $(CXXFLAGS) $^ -o $@ $(CXXLIBS)
+	@$(CXX) $(CXXFLAGS) $(CXXLIBS) $^ -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(dir $@)
-	@echo "Compiling $< -> $@ ..."
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(eval DEP = $(patsubst $(OBJ_DIR)/%.o, $(DEP_DIR)/%.d, $@))
+	@mkdir -p $(dir $@) $(dir $(DEP))
+	@echo "Compiling $< ..."
+	@$(CXX) $(CXXFLAGS) -c $< -o $@ -MF $(DEP)
 
-.PHONY: all clean run
+-include $(DEPS)
 
 clean:
 	@echo "Cleaning up ..."
 	@rm -rf $(BUILD_DIR)
 
 run: $(TARGET)
-	@echo "Running $<"
+	@echo "Running $< ..."
 	@./$<
