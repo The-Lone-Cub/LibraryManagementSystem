@@ -1,86 +1,24 @@
 [
-  {
-    "directory": "C:\\Users\\User\\Desktop\\Projects\\LibraryManagementSystem",
-    "arguments": [
-      "clang++",
-      "-std=c++23",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-pedantic",
-      "-MMD",
-      "-MP",
-      "-I.",
-      "-c",
-      "src/main.cpp",
-      "-o",
-      "build/obj/main.o",
-      "-MF",
-      "build/dep/main.d"
-    ],
-    "file": "src/main.cpp"
-  },
-  {
-    "directory": "C:\\Users\\User\\Desktop\\Projects\\LibraryManagementSystem",
-    "arguments": [
-      "clang++",
-      "-std=c++23",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-pedantic",
-      "-MMD",
-      "-MP",
-      "-I.",
-      "-c",
-      "src/render/button.cpp",
-      "-o",
-      "build/obj/render/button.o",
-      "-MF",
-      "build/dep/render/button.d"
-    ],
-    "file": "src/render/button.cpp"
-  },
-  {
-    "directory": "C:\\Users\\User\\Desktop\\Projects\\LibraryManagementSystem",
-    "arguments": [
-      "clang++",
-      "-std=c++23",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-pedantic",
-      "-MMD",
-      "-MP",
-      "-I.",
-      "-c",
-      "src/render/object.cpp",
-      "-o",
-      "build/obj/render/object.o",
-      "-MF",
-      "build/dep/render/object.d"
-    ],
-    "file": "src/render/object.cpp"
-  },
-  {
-    "directory": "C:\\Users\\User\\Desktop\\Projects\\LibraryManagementSystem",
-    "arguments": [
-      "clang++",
-      "-std=c++23",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-pedantic",
-      "-MMD",
-      "-MP",
-      "-I.",
-      "-c",
-      "src/render/text.cpp",
-      "-o",
-      "build/obj/render/text.o",
-      "-MF",
-      "build/dep/render/text.d"
-    ],
-    "file": "src/render/text.cpp"
-  }
-]
+ {
+  "directory": "C:\\Users\\User\\Desktop\\Projects\\LibraryManagementSystem",
+  "arguments": [
+   "clang++",
+   "-std=c++23",
+   "-Wall",
+   "-Wextra",
+   "-Werror",
+   "-pedantic",
+   "-MMD",
+   "-MP",
+   "-I.",
+   "-Iftxui/include",
+   "-c",
+   "src/main.cpp",
+   "-o",
+   "build/obj/main.o",
+   "-MF",
+   "build/dep/main.d"
+  ],
+  "file": "src/main.cpp"
+ }
+]
