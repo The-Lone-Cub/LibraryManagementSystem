@@ -10,7 +10,7 @@ void RegistrationScreen(ftxui::ScreenInteractive& screen, std::string& next_scre
         return window(
             text("Registration Form") | bold,
             text("Details will be brought in with time. Please wait...")
-        );
+        ) | center;
     });
 
     Component list = CatchEvent(ui, [&](Event event) {
@@ -76,11 +76,45 @@ void LoginScreen(ftxui::ScreenInteractive& screen, std::string& next_screen) {
 void SubmissionScreen(ftxui::ScreenInteractive& screen, std::string& next_screen) {
     using namespace ftxui;
 
-    Component ui = Renderer([] {
+    Component file_tree = Renderer([] {
+        return window(text("Tab1 - User Explorer"), text("Lists all users"));
+    });
+
+    Component editor = Renderer([] {
+        return window(text("Tab2 - Main"), text("Handling of specific tasks"));
+    });
+
+    Component chat_panel = Renderer([] {
+        return window(text("Tab3 - Book Explorer"), text("Lists all books"));
+    });
+
+    Component terminal = Renderer([] {
+        return window(text("Tab4 - Summary"), text("Shows summary of selected object"));
+    });
+
+    Component top_row = Container::Horizontal({
+        file_tree,
+        editor,
+        chat_panel
+    });
+
+    Component full_layout = Container::Vertical({
+        top_row,
+        terminal
+    });
+
+    Component ui = Renderer([&] {
         return window(
-            text("Main window"),
-            text("This contains the actual page")
-        );
+            text("Library Management System") | underlined, vbox(
+            {
+                hbox({
+                    file_tree->Render() | size(WIDTH, EQUAL, 30) | size(HEIGHT, EQUAL, screen.dimy() - 8),
+                    editor->Render() | xflex | size(HEIGHT, EQUAL, screen.dimy() - 8),
+                    chat_panel->Render() | size(WIDTH, EQUAL, 30) | size(HEIGHT, EQUAL, screen.dimy() - 8)
+                }),
+                terminal->Render() | size(HEIGHT, EQUAL, 8)
+            }
+        ));
     });
 
     Component ev = CatchEvent(ui, [&](Event event) {
