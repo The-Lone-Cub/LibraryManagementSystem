@@ -27,9 +27,12 @@ void RegistrationScreen(ftxui::ScreenInteractive& screen, std::string& next_scre
     Component password_input = Input(&password, "admin");
 
     Component submit = Button("SUBMIT", [&] {output = username + " registered successfully.!";}, Style());
+    Component clear = Button("RESET", [&] {first = last = username = password = output = "";}, Style());
+    int childform = 0, childbut = 0;
+    Component buts = Container::Horizontal({submit, clear}, &childbut);
     Component form = Container::Vertical({
-        first_input, last_input, username_input, password_input, submit
-    });
+        first_input, last_input, username_input, password_input, buts
+    }, &childform);
 
     Component ui = Renderer(form, [&] {
         return window(
@@ -52,7 +55,10 @@ void RegistrationScreen(ftxui::ScreenInteractive& screen, std::string& next_scre
                         password_input->Render() | size(WIDTH, EQUAL, 20)
                     }),
                     separator(),
-                    submit->Render() | flex,
+                    hbox({
+                        submit->Render() | flex,
+                        clear->Render() | flex
+                    }),
                     text(output)
             })
         ) | center;
@@ -63,7 +69,7 @@ void RegistrationScreen(ftxui::ScreenInteractive& screen, std::string& next_scre
             next_screen = "login";
             screen.ExitLoopClosure()();
             return true;
-        } else if(event == Event::Return) {
+        } else if(event == Event::Return && !(childform == 4 && childbut == 1)) {
             submit->OnEvent(Event::Return);
             return true;
         }
