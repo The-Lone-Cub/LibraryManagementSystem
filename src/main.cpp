@@ -3,13 +3,58 @@
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
 
+ftxui::ButtonOption Style() {
+    using namespace ftxui;
+    auto option = ButtonOption::Animated();
+    option.transform = [](const EntryState& s) {
+        auto element = text(s.label);
+        if(s.focused) {
+            element |= bold;
+        }
+        return element | center | borderEmpty | flex;
+    };
+    return option;
+}
+
 void RegistrationScreen(ftxui::ScreenInteractive& screen, std::string& next_screen) {
     using namespace ftxui;
 
-    Component ui = Renderer([&] {
+    std::string first, last, username, password, output;
+
+    Component first_input = Input(&first, "John");
+    Component last_input = Input(&last, "Doe");
+    Component username_input = Input(&username, "user123");
+    Component password_input = Input(&password, "admin");
+
+    Component submit = Button("SUBMIT", [&] {output = username + " registered successfully.!";}, Style());
+    Component form = Container::Vertical({
+        first_input, last_input, username_input, password_input, submit
+    });
+
+    Component ui = Renderer(form, [&] {
         return window(
             text("Registration Form") | bold,
-            text("Details will be brought in with time. Please wait...")
+            vbox({
+                    hbox({
+                        text("First Name: "),
+                        first_input->Render() | size(WIDTH, EQUAL, 20)
+                        }),
+                    hbox({
+                        text("Last Name: "),
+                        last_input->Render() | size(WIDTH, EQUAL, 20)
+                    }),
+                    hbox({
+                        text("Username: "),
+                        username_input->Render() | size(WIDTH, EQUAL, 20)
+                    }),
+                    hbox({
+                        text("Password: "),
+                        password_input->Render() | size(WIDTH, EQUAL, 20)
+                    }),
+                    separator(),
+                    submit->Render() | flex,
+                    text(output)
+            })
         ) | center;
     });
 
@@ -17,6 +62,9 @@ void RegistrationScreen(ftxui::ScreenInteractive& screen, std::string& next_scre
         if(event == Event::Escape) {
             next_screen = "login";
             screen.ExitLoopClosure()();
+            return true;
+        } else if(event == Event::Return) {
+            submit->OnEvent(Event::Return);
             return true;
         }
         return false;
@@ -32,9 +80,9 @@ void LoginScreen(ftxui::ScreenInteractive& screen, std::string& next_screen) {
     Component user = Input(&username, "John Doe");
     Component pass = Input(&password, "admin");
 
-    Component submit = Button("SUBMIT", [&]{next_screen = "submit"; screen.ExitLoopClosure()();});
-    Component regist = Button("REGISTER", [&]{next_screen = "register"; screen.ExitLoopClosure()();});
-    Component reset = Button("RESET", [&]{username = ""; password = "";});
+    Component submit = Button("SUBMIT", [&]{next_screen = "submit"; screen.ExitLoopClosure()();}, Style());
+    Component regist = Button("REGISTER", [&]{next_screen = "register"; screen.ExitLoopClosure()();}, Style());
+    Component reset = Button("RESET", [&]{username = ""; password = "";}, Style());
 
     Component buttons = Container::Horizontal({regist, submit, reset});
     int child_index = 0;
