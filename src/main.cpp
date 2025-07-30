@@ -2,6 +2,14 @@
 #include "ftxui/component/component_base.hpp"
 #include "ftxui/component/screen_interactive.hpp"
 #include "ftxui/dom/elements.hpp"
+#include <thread>
+
+struct user {
+    std::string username;
+    std::string password;
+};
+
+std::vector<user> Users;
 
 ftxui::ButtonOption Style() {
     using namespace ftxui;
@@ -20,13 +28,25 @@ void RegistrationScreen(ftxui::ScreenInteractive& screen, std::string& next_scre
     using namespace ftxui;
 
     std::string first, last, username, password, output;
-
     Component first_input = Input(&first, "John");
     Component last_input = Input(&last, "Doe");
     Component username_input = Input(&username, "user123");
-    Component password_input = Input(&password, "admin");
+    InputOption passfield;
+    passfield.password = true;
+    Component password_input = Input(&password, "admin", passfield);
 
-    Component submit = Button("SUBMIT", [&] {output = username + " registered successfully.!";}, Style());
+    Component submit = Button("SUBMIT", [&] {
+        if(first.empty() || last.empty() || username.empty() || password.empty()) {
+            output = "Empty fields detected. Submission denied.";
+        } else {
+            output = username + " registered successfully. Returning to login screen...";
+            Users.push_back({username, password});
+            using namespace std::chrono_literals;
+            std::this_thread::sleep_for(3s);
+            next_screen = "login";
+            screen.ExitLoopClosure()();
+        }
+    }, Style());
     Component clear = Button("RESET", [&] {first = last = username = password = output = "";}, Style());
     int childform = 0, childbut = 0;
     Component buts = Container::Horizontal({submit, clear}, &childbut);
@@ -59,7 +79,7 @@ void RegistrationScreen(ftxui::ScreenInteractive& screen, std::string& next_scre
                         submit->Render() | flex,
                         clear->Render() | flex
                     }),
-                    text(output)
+                    text(output) | color((output.substr(0, 5) != "Empty" ? Color::Green : Color::Red))
             })
         ) | center;
     });
@@ -82,11 +102,29 @@ void RegistrationScreen(ftxui::ScreenInteractive& screen, std::string& next_scre
 void LoginScreen(ftxui::ScreenInteractive& screen, std::string& next_screen) {
     using namespace ftxui;
 
-    std::string username, password;
+    std::string username, password, output;
     Component user = Input(&username, "John Doe");
-    Component pass = Input(&password, "admin");
+    InputOption passfield;
+    passfield.password = true;
+    Component pass = Input(&password, "admin", passfield);
 
-    Component submit = Button("SUBMIT", [&]{next_screen = "submit"; screen.ExitLoopClosure()();}, Style());
+    Component submit = Button("SUBMIT", [&]{
+        bool f = false;
+        for(const auto& i : Users) {
+            if(username == i.username && password == i.password) {
+                output = "Login successful";
+                using namespace std::chrono_literals;
+                std::this_thread::sleep_for(3s);
+                next_screen = "submit";
+                screen.ExitLoopClosure()();
+                f = true;
+                break;
+            }
+        }
+
+        if(!f) output = "Access denied. Recheck credentials.";
+
+    }, Style());
     Component regist = Button("REGISTER", [&]{next_screen = "register"; screen.ExitLoopClosure()();}, Style());
     Component reset = Button("RESET", [&]{username = ""; password = "";}, Style());
 
@@ -119,7 +157,9 @@ void LoginScreen(ftxui::ScreenInteractive& screen, std::string& next_screen) {
                             regist->Render() | size(WIDTH, EQUAL, 10),
                             submit->Render() | size(WIDTH, EQUAL, 10),
                             reset->Render() | size(WIDTH, EQUAL, 10)
-                        ) | center
+                        ) | center,
+                        separator(),
+                        text(output) | color(output.substr(0, 6) == "Access" ? Color::Red : Color::Green)
             )
         ) | center;
     });
